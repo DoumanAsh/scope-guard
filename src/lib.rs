@@ -45,6 +45,30 @@
 //! assert_eq!(val, 1);
 //! ```
 //!
+//! #### Stacked destructor calls
+//!
+//! ```
+//! use scope_guard::scope_guard;
+//!
+//! fn do_stuff(val: &mut u32)  {
+//!     let old_value = *val;
+//!     let val = scope_guard!(|val| {
+//!         assert_eq!(*val, old_value);
+//!         //Do nothing
+//!     }, val);
+//!
+//!     let mut val = val.stack(|val| {
+//!         **val = old_value;
+//!     });
+//!
+//!     **val += 1; //Double * to deref &mut u32
+//! }
+//!
+//! let mut val = 0;
+//! do_stuff(&mut val);
+//! assert_eq!(val, 0);
+//! ```
+//!
 //! #### Multiple argument guard
 //!
 //! ```
@@ -131,6 +155,25 @@ impl<T, F: FnOnce(T)> Scope<T, F> {
     pub fn forget(self) {
         self.get_dtor();
         mem::forget(self);
+    }
+}
+
+impl<T, F: FnOnce(T)> Scope<T, F> {
+    ///Adds new function to be invoked in scope of the guard.
+    ///
+    ///This function is executed before current one.
+    ///Similarly to how stack variables dtors are invoked in reverse order.
+    ///
+    ///Note that stacked function cannot take guarded by value, only original function will retain
+    ///owned value.
+    pub fn stack<NF: FnOnce(&mut T)>(self, dtor: NF) -> Scope<T, impl FnOnce(T)> {
+        let current_dtor = self.get_dtor();
+        let value = self.get_value();
+        mem::forget(self);
+        Scope::new(value, move |mut value| {
+            dtor(&mut value);
+            current_dtor(value)
+        })
     }
 }
 
