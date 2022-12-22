@@ -5,3 +5,7 @@
 [![Documentation](https://docs.rs/scope-guard/badge.svg)](https://docs.rs/crate/scope-guard/)
 
 Simple RAII scope guard
+
+## Features
+
+- `std` - Enables async scope to run destructor when future finishes, even if it panics

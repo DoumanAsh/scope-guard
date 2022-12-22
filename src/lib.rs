@@ -109,8 +109,14 @@
 #![no_std]
 #![warn(missing_docs)]
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::style))]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::explicit_auto_deref))]
 
 use core::{ptr, mem};
+
+#[cfg(feature = "std")]
+mod async_scope;
+#[cfg(feature = "std")]
+pub use async_scope::async_scope;
 
 ///RAII Scope, running closure in destructor.
 pub struct Scope<T, F: FnOnce(T)> {
