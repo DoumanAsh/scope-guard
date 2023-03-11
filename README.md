@@ -8,4 +8,4 @@ Simple RAII scope guard
 
 ## Features
 
-- `std` - Enables async scope to run destructor when future finishes, even if it panics
+- `std` - Enables async scope to run destructor when future finishes, even if it panics.

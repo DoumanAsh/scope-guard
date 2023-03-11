@@ -31,7 +31,7 @@ use core::task;
 pub struct CatchUnwindFut<F: panic::UnwindSafe>(pub F);
 
 impl<F: Future + panic::UnwindSafe> Future for CatchUnwindFut<F> {
-    type Output = Result<F::Output, Box<dyn Any + Send>>;
+    type Output = Result<F::Output, Box<dyn Any + Send + 'static>>;
 
     #[inline(always)]
     fn poll(self: Pin<&mut Self>, ctx: &mut task::Context<'_>) -> task::Poll<Self::Output> {
