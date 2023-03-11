@@ -116,7 +116,7 @@ use core::{ptr, mem};
 #[cfg(feature = "std")]
 mod async_scope;
 #[cfg(feature = "std")]
-pub use async_scope::async_scope;
+pub use async_scope::{async_scope, CatchUnwindFut};
 
 ///RAII Scope, running closure in destructor.
 pub struct Scope<T, F: FnOnce(T)> {
